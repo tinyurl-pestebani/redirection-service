@@ -1,6 +1,9 @@
 FROM rust:1.88.0-alpine3.22 AS builder
 LABEL authors="pablo"
 
+# Create a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 WORKDIR /usr/src/app
 
 COPY ./src ./src
@@ -13,6 +16,13 @@ RUN apk add --no-cache musl-dev pkgconf build-base openssl-dev protobuf-dev perl
 
 
 FROM scratch
+
+# Copy the user and group files from the builder stage
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+# Set the non-root user
+USER appuser:appgroup
 
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/redirection-service /redirection-service
 
