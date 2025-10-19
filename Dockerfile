@@ -20,6 +20,7 @@ FROM scratch
 # Copy the user and group files from the builder stage
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
+COPY --from=builder /etc/ssl /etc/ssl
 
 # Set the non-root user
 USER appuser:appgroup
