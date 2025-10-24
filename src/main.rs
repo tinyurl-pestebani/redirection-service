@@ -7,6 +7,7 @@ use anyhow::Result;
 
 use rust_otel_setup::otel::OpenTelemetryObject;
 use rust_otel_setup::config as otel_config;
+use tracing::log::{debug, info};
 
 mod database;
 mod app;
@@ -24,11 +25,19 @@ use crate::config::RedirectionServiceConfig;
 #[tokio::main]
 async fn main() -> Result<()> {
     let config = RedirectionServiceConfig::from_env()?;
+    debug!("Connecting to database");
     let db_layer = database::layer::new_db_layer(&config).await?;
+    debug!("Connected to database");
+    debug!("Connecting to task queue sender");
     let task_sender = task_sender::layer::new_task_sender(&config).await?;
+    debug!("Connected to task queue sender");
+    debug!("Starting key generator");
     let key_generator = key_generator::layer::new_key_generation_service(&config.key_generator).await?;
+    debug!("Key generator started");
+    debug!("Starting OpenTelemetry");
 
     let otel_object = OpenTelemetryObject::new(&otel_config::LogConfig::from_env()?, &otel_config::TraceConfig::from_env()?, "redirection-service".into()).await?;
+    debug!("OpenTelemetry started");
     
     let app_state = AppState::new(db_layer, task_sender, key_generator).await?;
     let app = Router::new()
