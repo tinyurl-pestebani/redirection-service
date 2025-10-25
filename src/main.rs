@@ -24,6 +24,7 @@ use crate::config::RedirectionServiceConfig;
 /// The main entry point for the application.
 #[tokio::main]
 async fn main() -> Result<()> {
+    info!("Starting redirection service");
     let config = RedirectionServiceConfig::from_env()?;
     debug!("Connecting to database");
     let db_layer = database::layer::new_db_layer(&config).await?;
