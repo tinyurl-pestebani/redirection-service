@@ -24,8 +24,10 @@ use crate::config::RedirectionServiceConfig;
 /// The main entry point for the application.
 #[tokio::main]
 async fn main() -> Result<()> {
-    info!("Starting redirection service");
     let config = RedirectionServiceConfig::from_env()?;
+    let otel_object = OpenTelemetryObject::new(&otel_config::LogConfig::from_env()?, &otel_config::TraceConfig::from_env()?, "redirection-service".into()).await?;
+    debug!("OpenTelemetry started");
+    info!("Starting redirection service");
     debug!("Connecting to database");
     let db_layer = database::layer::new_db_layer(&config).await?;
     debug!("Connected to database");
@@ -35,10 +37,6 @@ async fn main() -> Result<()> {
     debug!("Starting key generator");
     let key_generator = key_generator::layer::new_key_generation_service(&config.key_generator).await?;
     debug!("Key generator started");
-    debug!("Starting OpenTelemetry");
-
-    let otel_object = OpenTelemetryObject::new(&otel_config::LogConfig::from_env()?, &otel_config::TraceConfig::from_env()?, "redirection-service".into()).await?;
-    debug!("OpenTelemetry started");
     
     let app_state = AppState::new(db_layer, task_sender, key_generator).await?;
     let app = Router::new()
