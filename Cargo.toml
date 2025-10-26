@@ -1,6 +1,6 @@
 [package]
 name = "redirection-service"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Pablo Esteban <pab.est.pe@gmail.com>"]
 edition = "2024"
 description = "service for creating shortened urls and redirecting to the original one when the shortened url is requested"

@@ -18,6 +18,9 @@ use tracing::log::{error, warn};
 /// The maximum size of the payload for the create_url endpoint.
 const MAX_PAYLOAD_SIZE: usize = 5 * 1024; // 5KB
 
+/// The route for health check.
+pub const HEALTHY_URL: &str = "/api/v1/healthy";
+
 /// The route for creating a new URL.
 pub const ROUTE_CREATE_URL: &str = "/api/v1/create";
 
@@ -65,6 +68,16 @@ pub async fn create_url(
     let url = format!("{schema}://{host}/{key}");
 
     Ok((StatusCode::CREATED, url))
+}
+
+
+/// This handler checks the health of the service.
+/// It returns a 200 OK status if the service is healthy.
+#[instrument(level = "debug", target = "healthy", skip(_state))]
+pub async fn get_healthy(
+    State(_state): State<AppState>
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    Ok(StatusCode::NO_CONTENT)
 }
 
 

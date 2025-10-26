@@ -17,7 +17,7 @@ mod key_generator;
 
 use app::AppState;
 use app::handlers::create_url;
-use crate::app::handlers::{get_url, ROUTE_CREATE_URL, ROUTE_GET_URL};
+use crate::app::handlers::{get_healthy, get_url, HEALTHY_URL, ROUTE_CREATE_URL, ROUTE_GET_URL};
 use crate::config::RedirectionServiceConfig;
 
 
@@ -42,6 +42,7 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route(ROUTE_CREATE_URL, post(create_url))
         .route(ROUTE_GET_URL, get(get_url))
+        .route(HEALTHY_URL, get(get_healthy))
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind(format!("[::]:{}", config.port))
