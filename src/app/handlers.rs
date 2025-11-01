@@ -77,7 +77,7 @@ pub async fn create_url(
 pub async fn get_healthy(
     State(_state): State<AppState>
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    Ok(StatusCode::NO_CONTENT)
+    Ok(StatusCode::OK)
 }
 
 
